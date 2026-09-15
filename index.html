@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>ATELIER — разработка Telegram-ботов на заказ</title>
+  <style>
+    :root {
+      --text: #f7f1ea;
+      --muted: rgba(247,241,234,.66);
+      --accent: #e8893a;
+      --accent-2: #ffb067;
+      --ink: #1a120c;
+      --line: rgba(255,196,140,.18);
+      --surface: rgba(20,16,12,.72);
+      --max: 1120px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(120% 70% at 50% 115%, rgba(232,137,58,.5) 0%, rgba(232,137,58,.16) 30%, transparent 58%),
+        linear-gradient(180deg, #070706 0%, #120e0b 38%, #2a1810 70%, #c45c22 100%);
+      background-attachment: fixed;
+    }
+    a { color: var(--accent-2); text-decoration: none; }
+    button, input, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    .wrap { width: min(100% - 32px, var(--max)); margin: 0 auto; }
+    header {
+      position: sticky; top: 0; z-index: 20;
+      background: linear-gradient(180deg, rgba(7,7,6,.94), rgba(7,7,6,.7) 70%, transparent);
+      backdrop-filter: blur(12px);
+    }
+    .top {
+      display: flex; align-items: center; gap: 16px;
+      padding: 14px 0; width: min(100% - 32px, var(--max)); margin: 0 auto;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+    .mark {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(160deg, #ffb067, #e8893a);
+      color: var(--ink); display: grid; place-items: center; font-weight: 750;
+    }
+    .brand strong { display: block; font-size: 16px; }
+    .brand span { display: block; font-size: 12px; color: var(--muted); }
+    nav { display: none; gap: 6px; }
+    nav a, .btn, .card, .stat, .step {
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+    }
+    nav a {
+      color: var(--muted); padding: 8px 12px; border-radius: 10px; border: 1px solid transparent;
+    }
+    nav a:hover, .btn:hover, .card:hover, .stat:hover {
+      transform: scale(1.04);
+      box-shadow: 0 0 0 1px rgba(255,176,103,.35), 0 10px 28px rgba(196,92,34,.28);
+    }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 48px; padding: 0 18px; border-radius: 12px; border: 0; font-weight: 650;
+      position: relative; overflow: hidden;
+    }
+    .btn::after {
+      content: ""; position: absolute; inset: 0 auto 0 -40%; width: 40%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
+      transform: translateX(-120%);
+    }
+    .btn:hover::after { animation: shine .7s ease; }
+    .btn.primary { background: linear-gradient(180deg, var(--accent-2), var(--accent)); color: var(--ink); }
+    .btn.ghost { background: var(--surface); border: 1px solid var(--line); color: var(--text); }
+    .hero { padding: 40px 0 24px; }
+    .kicker { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent-2); margin: 0 0 10px; }
+    h1 { margin: 0 0 12px; font-size: 34px; line-height: 1.12; max-width: 16ch; }
+    .lead { margin: 0 0 20px; color: var(--muted); max-width: 58ch; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+    .trust { display: grid; gap: 8px; margin: 0 0 24px; padding: 0; list-style: none; color: var(--muted); font-size: 14px; }
+    .trust li { padding-left: 18px; position: relative; }
+    .trust li::before { content: ""; position: absolute; left: 0; top: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+    .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 48px; }
+    .stat, .card, .step, .faq, .panel {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 14px; backdrop-filter: blur(12px);
+    }
+    .stat { text-align: center; padding: 16px 10px; }
+    .stat b { display: block; font-size: 18px; }
+    .stat span { color: var(--muted); font-size: 12px; }
+    section { padding: 8px 0 48px; }
+    h2 { margin: 0 0 8px; font-size: 28px; line-height: 1.2; }
+    .sub { margin: 0 0 20px; color: var(--muted); max-width: 60ch; }
+    .offer { padding: 20px; margin-bottom: 16px; }
+    .offer ol { margin: 12px 0 0; padding-left: 20px; color: var(--muted); }
+    .grid-2 { display: grid; gap: 12px; }
+    .card { padding: 18px; text-align: left; color: inherit; width: 100%; }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .price { color: var(--accent-2); font-weight: 650; margin: 0 0 10px; }
+    .card p { margin: 0 0 10px; color: var(--muted); }
+    .card ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+    .steps { display: grid; gap: 12px; }
+    .step { padding: 18px; }
+    .num { color: var(--accent-2); font-weight: 750; margin: 0 0 8px; }
+    .step h3, .faq h3 { margin: 0 0 6px; font-size: 17px; }
+    .step p, .faq p { margin: 0; color: var(--muted); }
+    .faq { padding: 16px 18px; margin-bottom: 10px; }
+    form { display: grid; gap: 12px; max-width: 520px; }
+    label { font-size: 13px; color: var(--muted); }
+    input, textarea, select {
+      width: 100%; background: var(--surface); border: 1px solid var(--line);
+      border-radius: 10px; padding: 12px; margin-top: 6px;
+    }
+    textarea { min-height: 110px; resize: vertical; }
+    footer {
+      border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--muted);
+    }
+    .foot { display: grid; gap: 8px; }
+    .ok { display: none; padding: 24px; }
+    .ok.show { display: block; }
+    @keyframes shine { to { transform: translateX(380%); } }
+    @media (min-width: 860px) {
+      .wrap, .top { width: min(100% - 64px, var(--max)); }
+      nav { display: flex; }
+      h1 { font-size: 52px; }
+      .hero { padding: 56px 0 32px; }
+      .trust { grid-template-columns: 1fr 1fr; max-width: 720px; }
+      .grid-2, .steps { grid-template-columns: 1fr 1fr; }
+      .foot { grid-template-columns: 1.4fr 1fr 1fr; gap: 24px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+      nav a:hover, .btn:hover, .card:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="top">
+      <div class="brand">
+        <div class="mark">A</div>
+        <div><strong>ATELIER</strong><span>Боты Telegram на заказ</span></div>
+      </div>
+      <nav aria-label="Разделы">
+        <a href="#uslugi">Услуги</a>
+        <a href="#process">Как работаем</a>
+        <a href="#faq">Вопросы</a>
+        <a href="#contacts">Контакты</a>
+      </nav>
+      <a class="btn primary" href="#brief">Заказать бота</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <p class="kicker">Разработка под ключ</p>
+      <h1>Разработка Telegram-ботов под ключ</h1>
+      <p class="lead">Бот для заявок, продаж, записи и поддержки — от 15 000 ₽. До начала работ согласуем сценарий, смету и сроки. Разрабатываю, тестирую и передаю готовый проект с исходным кодом.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#brief">Получить оценку</a>
+        <a class="btn ghost" href="https://t.me/ckot_23">Написать в Telegram</a>
+      </div>
+      <ul class="trust">
+        <li>Оценка до начала работ</li>
+        <li>Фиксируем объём и смету</li>
+        <li>14 дней правок после запуска</li>
+        <li>Ответ в течение рабочего дня</li>
+      </ul>
+      <div class="stats">
+        <div class="stat"><b>от 15 000 ₽</b><span>Стоимость</span></div>
+        <div class="stat"><b>от 5 дней</b><span>Срок запуска</span></div>
+        <div class="stat"><b>50% / 50%</b><span>Предоплата</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="panel offer">
+        <p class="kicker">Стартовый пакет</p>
+        <h2>Бот для канала от 15 000 ₽</h2>
+        <p class="sub">Один согласованный сценарий: кнопки под постами, заявка и уведомление вам в Telegram.</p>
+        <ol>
+          <li>Сбор заявки и контакта из канала</li>
+          <li>Уведомление о заявке в Telegram</li>
+          <li>Тестирование, запуск и передача проекта</li>
+        </ol>
+        <p class="sub" style="margin-top:12px">Магазин, запись и поддержка — отдельные сборки ниже. Точный объём закрепим в смете.</p>
+        <a class="btn primary" href="#brief">Обсудить задачу</a>
+      </div>
+    </section>
+
+    <section id="uslugi">
+      <p class="kicker">Что делаю</p>
+      <h2>Боты под конкретную задачу</h2>
+      <p class="sub">Четыре готовые сборки. В карточке — зачем бот нужен и где такой сценарий уже работает.</p>
+      <div class="grid-2">
+        <article class="card">
+          <h3>Бот-магазин</h3>
+          <p class="price">от 30 000 ₽ · 10–14 дней</p>
+          <p>Каталог, корзина и оплата ЮKassa / СБП прямо в Telegram. Заказ приходит вам с составом, суммой и контактом.</p>
+          <ul>
+            <li>Магазин одежды или мерча</li>
+            <li>Доставка еды: меню и слот курьера</li>
+            <li>Цифровые товары после оплаты</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Бот поддержки</h3>
+          <p class="price">от 20 000 ₽ · 7–10 дней</p>
+          <p>Первая линия по FAQ 24/7. Сложные обращения уходят человеку, чтобы очередь не копилась в личке.</p>
+          <ul>
+            <li>Статус заказа и возврат</li>
+            <li>Онлайн-школа: доступ к урокам</li>
+            <li>Сервис: тарифы и передача мастеру</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Бот записи</h3>
+          <p class="price">от 20 000 ₽ · 7–10 дней</p>
+          <p>Клиент видит свободные слоты, записывается сам и получает напоминание. Мастер видит день одним списком.</p>
+          <ul>
+            <li>Салон красоты и барбершоп</li>
+            <li>Стоматология или массаж</li>
+            <li>Автосервис на конкретный час</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Бот для канала</h3>
+          <p class="price">от 15 000 ₽ · 5–7 дней</p>
+          <p>Из поста человек сразу оставляет заявку. Вы получаете контакт и тему, а не десятки «привет» в личке.</p>
+          <ul>
+            <li>Заявка на консультацию из поста</li>
+            <li>Анонсы курсов и вебинаров</li>
+            <li>Локальный бизнес: «хочу прайс»</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="process">
+      <p class="kicker">Процесс</p>
+      <h2>Как мы работаем</h2>
+      <p class="sub">Прозрачный путь от идеи до запуска. Оплата 50% после сметы и 50% перед передачей кода.</p>
+      <div class="steps">
+        <article class="step"><p class="num">1</p><h3>Анализ и ТЗ</h3><p>Разбираем задачу, описываем сценарии и фиксируем смету до старта.</p></article>
+        <article class="step"><p class="num">2</p><h3>Разработка</h3><p>Собираю бота, подключаю уведомления, при необходимости ЮKassa и СБП.</p></article>
+        <article class="step"><p class="num">3</p><h3>Тестирование</h3><p>Прогоняем сценарии вместе, правим формулировки и краевые случаи.</p></article>
+        <article class="step"><p class="num">4</p><h3>Запуск и правки</h3><p>Выкладка, передача исходного кода и 14 дней правок после запуска.</p></article>
+      </div>
+    </section>
+
+    <section id="faq">
+      <p class="kicker">FAQ</p>
+      <h2>Частые вопросы</h2>
+      <div class="faq"><h3>Сколько стоит разработка?</h3><p>Канал — от 15 000 ₽, поддержка и запись — от 20 000 ₽, магазин — от 30 000 ₽. После брифа присылаю точную смету.</p></div>
+      <div class="faq"><h3>Сколько времени занимает запуск?</h3><p>Бот для канала — 5–7 дней, поддержка и запись — 7–10 дней, магазин — 10–14 дней.</p></div>
+      <div class="faq"><h3>Как оплата?</h3><p>50% предоплата счётом в Telegram через ЮKassa, 50% перед передачей кода. Чек 54-ФЗ — через ЮKassa.</p></div>
+      <div class="faq"><h3>Что будет после запуска?</h3><p>Исходный код ваш. 14 дней правок входят в стоимость. Дальше — по договорённости.</p></div>
+    </section>
+
+    <section id="brief">
+      <p class="kicker">Оценка</p>
+      <h2>Готовы начать?</h2>
+      <p class="sub">Оставьте контакт — уточню задачу и отвечу в течение рабочего дня. Без обязательств.</p>
+      <form id="briefForm">
+        <div><label for="kind">Тип бота</label>
+          <select id="kind" required>
+            <option value="channel">Канал и контент</option>
+            <option value="support">Поддержка</option>
+            <option value="booking">Запись</option>
+            <option value="shop">Магазин</option>
+          </select></div>
+        <div><label for="task">Что должен делать бот</label>
+          <textarea id="task" required placeholder="Коротко: откуда заявки, что должно произойти дальше"></textarea></div>
+        <div><label for="contact">Telegram</label>
+          <input id="contact" required placeholder="@username" /></div>
+        <button class="btn primary" type="submit">Получить оценку</button>
+      </form>
+      <div class="ok" id="ok">Заявка принята. Напишу в Telegram в течение рабочего дня.</div>
+    </section>
+  </main>
+
+  <footer id="contacts">
+    <div class="wrap foot">
+      <div>
+        <strong style="color:var(--text)">ATELIER</strong>
+        <p>Разработка Telegram-ботов для заявок, продаж и поддержки.</p>
+      </div>
+      <div>
+        <strong style="color:var(--text)">Услуги</strong>
+        <p><a href="#uslugi">Магазин</a></p>
+        <p><a href="#uslugi">Поддержка</a></p>
+        <p><a href="#uslugi">Запись</a></p>
+        <p><a href="#uslugi">Канал</a></p>
+      </div>
+      <div>
+        <strong style="color:var(--text)">Контакты</strong>
+        <p><a href="https://t.me/ckot_23">@ckot_23</a></p>
+        <p><a href="mailto:andreydragon22813@gmail.com">andreydragon22813@gmail.com</a></p>
+        <p>Отвечаю на заявку в течение рабочего дня.</p>
+      </div>
+    </div>
+  </footer>
+  <script>
+    document.getElementById("briefForm").onsubmit = e => {
+      e.preventDefault();
+      e.target.style.display = "none";
+      document.getElementById("ok").classList.add("show");
+    };
+  </script>
+</body>
+</html>
